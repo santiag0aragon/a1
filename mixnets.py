@@ -9,6 +9,7 @@ from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
 import random
 import string
+import datetime
 
 
 def pack_message(message):
@@ -20,7 +21,6 @@ def pack_message(message):
     e2 = create_message(key_c, e1)
     e3 = create_message(key_b, e2)
     e4 = create_message(key_a, e3)
-
     return e4
 #  Cache encyption
 def create_message(key_path, message):
@@ -58,13 +58,17 @@ def aes_encrypt(key, iv, message):
     # key = b'password'
     BS = 16
     add_padding = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
-    print len(message)
     p_msg = add_padding(message)
-    print len(p_msg)
     cipher = AES.new(key, AES.MODE_CBC, iv)
     return cipher.encrypt(p_msg)
 
 
+def parse_entry(entry):
+    e =  entry.split(' ')
+    date = datetime.strptime(e[0],"%Y-%m-%dT%H:%M:%S.%f")
+    participant = [2]
+    message = [4]
+    print date
 def recv_one_message(sock):
     lengthbuf = recvall(sock, 4)
     length, = struct.unpack('!I', lengthbuf)
@@ -88,30 +92,43 @@ def send_one_message(sock, data):
     sock.sendall(data)
 
 
-def parseLog():
+def parseClientLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/clients'
     return urllib2.urlopen(log_add).read()
 
+def parseCacheLog():
+    log_add = 'http://pets.ewi.utwente.nl:59973/log/cache'
+    return urllib2.urlopen(log_add).read()
 
-def connect():
+def send_message(recipient, message):
+    message = '%s\t%s' % (recipient, message)
     HOST = 'pets.ewi.utwente.nl'
     PORT = 51666
     clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     clientsocket.connect((HOST, PORT))
-    send_one_message(clientsocket, 'email')
-    while True:
-            buf = recv_one_message(clientsocket)
-            # data = clientsocket.recv(4096)
-            if len(buf) > 0:
-                print "Received response:\n" + str(buf)
-                break
+    e4 = pack_message(message)
+    send_one_message(clientsocket, e4)
+    # while True:
+    #         buf = recv_one_message(clientsocket)
+    #         # data = clientsocket.recv(4096)
+    #         if len(buf) > 0:
+    #             print "Received response:\n" + str(buf)
+    #             break
 
+def one_a():
+    send_message('OWAIS','That is not secret message')
+
+def one_b():
+    send_message('TIM','s1750542')
 # print parseLog()
 # print create_message()
 # print generate_key_iv()
-message ='''
-es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas "Letraset", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.
-'''
-k_aes, iv = generate_key_iv()
-e1_aes = aes_encrypt(k_aes, iv, message)
+# message ='''
+# es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas "Letraset", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.
+# '''
+# k_aes, iv = generate_key_iv()
+# e1_aes = aes_encrypt(k_aes, iv, message)
 
+#
+one_b()
+print parseCacheLog()
