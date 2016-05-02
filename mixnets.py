@@ -9,7 +9,13 @@ from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
 import random
 import string
-import datetime
+from datetime import datetime
+
+import numpy as np
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import pandas
+from collections import Counter
 
 
 def pack_message(message):
@@ -63,12 +69,7 @@ def aes_encrypt(key, iv, message):
     return cipher.encrypt(p_msg)
 
 
-def parse_entry(entry):
-    e =  entry.split(' ')
-    date = datetime.strptime(e[0],"%Y-%m-%dT%H:%M:%S.%f")
-    participant = [2]
-    message = [4]
-    print date
+
 def recv_one_message(sock):
     lengthbuf = recvall(sock, 4)
     length, = struct.unpack('!I', lengthbuf)
@@ -96,9 +97,50 @@ def parseClientLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/clients'
     return urllib2.urlopen(log_add).read()
 
+
 def parseCacheLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/cache'
     return urllib2.urlopen(log_add).read()
+
+
+def start(mix_num):
+    log_add = 'http://pets.ewi.utwente.nl:59973/cmd/mix%s' % mix_num
+    urllib2.urlopen(log_add)
+    print 'Mixer %s started...' % mix_num
+
+
+def stop():
+    log_add = 'http://pets.ewi.utwente.nl:59973/cmd/reset'
+    urllib2.urlopen(log_add)
+    print 'Mixer stoped'
+
+
+def parse_entry(entry):
+    e =  entry.split(' ')
+    date = datetime.strptime(e[0],"%Y-%m-%dT%H:%M:%S.%f")
+    participant = [2]
+    message = [4]
+    return {'date': date, 'participant': participant, 'message': message}
+
+
+def second_freq(log):
+    times = list()
+    for entry in log.split('\n'):
+        if entry != '':
+            times.append('%s:%s:%s' % (parse_entry(entry)['date'].hour, parse_entry(entry)['date'].minute, parse_entry(entry)['date'].second))
+
+    counts = Counter(times)
+    plt.figure()
+    # counts = sorted(counts.items())
+    df = pandas.DataFrame.from_dict(counts, orient='index')
+    df.plot(kind='bar')
+    plt.xlabel('Time')
+    plt.ylabel('Frequency')
+    # # plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
+    plt.axis([0, len(counts)+1, 0, max(counts.values())+1])
+    plt.grid(True)
+    plt.show()
+
 
 def send_message(recipient, message):
     message = '%s\t%s' % (recipient, message)
@@ -116,19 +158,23 @@ def send_message(recipient, message):
     #             break
 
 def one_a():
+    start(1)
     send_message('OWAIS','That is not secret message')
+    stop()
 
 def one_b():
+    start(1)
     send_message('TIM','s1750542')
-# print parseLog()
-# print create_message()
-# print generate_key_iv()
-# message ='''
-# es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas "Letraset", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.
-# '''
-# k_aes, iv = generate_key_iv()
-# e1_aes = aes_encrypt(k_aes, iv, message)
+    stop()
 
-#
-one_b()
-print parseCacheLog()
+def one_c():
+    start(1)
+    second_freq(parseCacheLog())
+    stop()
+
+start(2)
+for x in range(100):
+    send_message('ME', 'message #%s'%x)
+    print 'injecting message #%s' % x
+second_freq(parseCacheLog())
+stop()
