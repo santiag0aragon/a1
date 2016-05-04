@@ -16,6 +16,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import pandas
 from collections import Counter
+from time import sleep
 
 
 def pack_message(message):
@@ -92,26 +93,54 @@ def send_one_message(sock, data):
     sock.sendall(struct.pack('!I', length))
     sock.sendall(data)
 
+def message_num():
+    log = parseClientLog()
+    times = list()
+
+    if log is not None and log != '':
+        # print len(log.split('\n'))
+        for entry in log.split('\n'):
+            if entry != '':
+                times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
+    return len(times)
+
 
 def parseClientLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/clients'
-    return urllib2.urlopen(log_add).read()
+    try:
+        log = urllib2.urlopen(log_add).read()
+        if log == '':
+            print 'Empty log...'
+        return log
+    except Exception, e:
+        # print 'No log found '
+        return ''
 
 
 def parseCacheLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/cache'
-    return urllib2.urlopen(log_add).read()
+    try:
+        log = urllib2.urlopen(log_add).read()
+        if log == '':
+            print 'Empty log...'
+        return log
+    except Exception, e:
+        print 'No log found '
+        return None
 
 
 def start(mix_num):
+    stop()
     log_add = 'http://pets.ewi.utwente.nl:59973/cmd/mix%s' % mix_num
     urllib2.urlopen(log_add)
+    # sleep(2)
     print 'Mixer %s started...' % mix_num
 
 
 def stop():
     log_add = 'http://pets.ewi.utwente.nl:59973/cmd/reset'
     urllib2.urlopen(log_add)
+    sleep(2)
     print 'Mixer stoped'
 
 
@@ -125,21 +154,23 @@ def parse_entry(entry):
 
 def second_freq(log):
     times = list()
-    for entry in log.split('\n'):
-        if entry != '':
-            times.append('%s:%s:%s' % (parse_entry(entry)['date'].hour, parse_entry(entry)['date'].minute, parse_entry(entry)['date'].second))
+    if log is not None and log != '':
+        for entry in log.split('\n'):
+            if entry != '':
+                times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
 
-    counts = Counter(times)
-    plt.figure()
-    # counts = sorted(counts.items())
-    df = pandas.DataFrame.from_dict(counts, orient='index')
-    df.plot(kind='bar')
-    plt.xlabel('Time')
-    plt.ylabel('Frequency')
-    # # plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
-    plt.axis([0, len(counts)+1, 0, max(counts.values())+1])
-    plt.grid(True)
-    plt.show()
+        counts = Counter(times)
+        # plt.figure()
+        # counts = sorted(counts.items())
+        df = pandas.DataFrame.from_dict(counts, orient='index')
+        df =  df.sort_index()
+        df.plot(kind='bar')
+        plt.xlabel('Time')
+        plt.ylabel('Frequency')
+        # # plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
+        plt.axis([0, len(counts)+1, 0, max(counts.values())+1])
+        plt.grid(True)
+        plt.show()
 
 
 def send_message(recipient, message):
@@ -172,9 +203,48 @@ def one_c():
     second_freq(parseCacheLog())
     stop()
 
-start(2)
-for x in range(100):
-    send_message('ME', 'message #%s'%x)
-    print 'injecting message #%s' % x
-second_freq(parseCacheLog())
-stop()
+
+# print parseCacheLog()
+# start(2)
+
+# for x in range(50):
+#     send_message('ME', 'SYNC')
+#     print 'Sending SYNC msgs'
+# stop()
+# start(2)
+# stop()
+# print parseCacheLog()
+# for attempt in range(10):
+#     start(2)
+#     print 'Attempt %s' % attempt
+#     for x in range(attempt):
+#         send_message('ME', 'Attempt %s: message #%s'% (attempt, x))
+#         print 'Attempt %s: injecting message #%s' % (attempt, x)
+#     print parseCacheLog()
+#     stop()
+def n_1_attack(mix_mes):
+    start(3)
+    message_sent = 0
+    while message_num() + message_sent < mix_mes:
+        print 'In the mix:%s\n sent: %s ' % ((message_num() + message_sent), message_sent)
+        print parseClientLog()
+        send_message('ME', '^^^^^^^^^^^^^^^^^^')
+        print parseCacheLog()
+        message_sent = message_sent + 1
+    sleep(2)
+    print parseCacheLog()
+    stop()
+
+
+# start(3)
+# for x in range(220):
+#     send_message('ME', 'message #%s'% ( x))
+#     sleep(2)
+#     print 'injecting message #%s\r' % ( x)
+    # log =  parseCacheLog()
+    # print log
+    # print 'Log len %s' % len(log.split('\n'))
+n_1_attack(14)
+log =  parseCacheLog()
+second_freq(log)
+# print parseCacheLog()
