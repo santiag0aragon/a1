@@ -29,6 +29,8 @@ def pack_message(message):
     e3 = create_message(key_b, e2)
     e4 = create_message(key_a, e3)
     return e4
+
+
 #  Cache encyption
 def create_message(key_path, message):
     key_rsa = open(key_path, 'rb').read()
@@ -133,7 +135,7 @@ def start(mix_num):
     stop()
     log_add = 'http://pets.ewi.utwente.nl:59973/cmd/mix%s' % mix_num
     urllib2.urlopen(log_add)
-    # sleep(2)
+    sleep(2)
     print 'Mixer %s started...' % mix_num
 
 
@@ -190,16 +192,22 @@ def send_message(recipient, message):
 
 def one_a():
     start(1)
+    # sleep(3)
     send_message('OWAIS','That is not secret message')
+    sleep(10)
     stop()
 
 def one_b():
     start(1)
     send_message('TIM','s1750542')
+    sleep(10)
     stop()
 
 def one_c():
     start(1)
+    for x in range(120):
+        send_message('ME', 'message #%s'% ( x))
+        print 'injecting message #%s\r' % ( x),
     second_freq(parseCacheLog())
     stop()
 
@@ -231,7 +239,7 @@ def n_1_attack(mix_mes):
         send_message('ME', '^^^^^^^^^^^^^^^^^^')
         print parseCacheLog()
         message_sent = message_sent + 1
-    sleep(2)
+    # sleep(2)
     print parseCacheLog()
     stop()
 
@@ -244,7 +252,20 @@ def n_1_attack(mix_mes):
     # log =  parseCacheLog()
     # print log
     # print 'Log len %s' % len(log.split('\n'))
-n_1_attack(14)
-log =  parseCacheLog()
-second_freq(log)
+# n_1_attack(14)
+# log =  parseCacheLog()
+#second_freq(log)
 # print parseCacheLog()
+
+# one_a()
+# log =  parseCacheLog()
+# print parseCacheLog()
+# print parseClientLog()
+
+# one_b()
+# log =  parseCacheLog()
+# print parseCacheLog()
+# print parseClientLog()
+
+
+# one_c()
