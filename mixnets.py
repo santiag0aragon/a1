@@ -107,6 +107,18 @@ def message_num():
     return len(times)
 
 
+def cache_num():
+    log = parseCacheLog()
+    times = list()
+
+    if log is not None and log != '':
+        # print len(log.split('\n'))
+        for entry in log.split('\n'):
+            if entry != '':
+                times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
+    return len(times)
+
+
 def parseClientLog():
     log_add = 'http://pets.ewi.utwente.nl:59973/log/clients'
     try:
@@ -135,7 +147,7 @@ def start(mix_num):
     stop()
     log_add = 'http://pets.ewi.utwente.nl:59973/cmd/mix%s' % mix_num
     urllib2.urlopen(log_add)
-    sleep(2)
+
     print 'Mixer %s started...' % mix_num
 
 
@@ -232,9 +244,37 @@ one_a()
 #         print 'Attempt %s: injecting message #%s' % (attempt, x)
 #     print parseCacheLog()
 #     stop()
+def n_1_a():
+    start(3)
+    sleep(.1)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    message_sent = 7
+    while cache_num() < 6:
+        print parseCacheLog()
+    # sleep(2)
+    stop()
+    sleep(2)
+    print parseClientLog()
+    print parseCacheLog()
+
 def n_1_attack(mix_mes):
     start(3)
-    message_sent = 0
+    sleep(.1)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    send_message('ME', '-'*7)
+    message_sent = 7
+    print parseClientLog()
     while message_num() + message_sent < mix_mes:
         print 'In the mix:%s\n sent: %s ' % ((message_num() + message_sent), message_sent)
         print parseClientLog()
@@ -244,6 +284,12 @@ def n_1_attack(mix_mes):
     # sleep(2)
     print parseCacheLog()
     stop()
+    print parseClientLog()
+
+
+
+n_1_a()
+# n_1_attack(30)
 
 
 
