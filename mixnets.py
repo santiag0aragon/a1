@@ -45,10 +45,14 @@ def create_message(key_path, message):
 def generate_key_iv():
     N = 5
     key_size = 16  # AES128
-    iterations = 10000
-    key = b''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
-    salt = Random.new().read(key_size)  # salt the hash
-    iv = Random.new().read(AES.block_size)
+    # iterations = 10000
+    iterations = 1
+    # key = b''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    key = b'J6EXO'
+    salt = b'??K7|3˾?PP?x?'#Random.new().read(key_size)
+
+    # iv = Random.new().read(AES.block_size)
+    iv = b'a'*16
     derived_key = PBKDF2(key, salt, key_size, iterations)
 
     return derived_key, iv
@@ -124,7 +128,8 @@ def parseClientLog():
     try:
         log = urllib2.urlopen(log_add).read()
         if log == '':
-            print 'Empty log...'
+            # print 'Empty log...'
+            pass
         return log
     except Exception, e:
         # print 'No log found '
@@ -136,10 +141,11 @@ def parseCacheLog():
     try:
         log = urllib2.urlopen(log_add).read()
         if log == '':
-            print 'Empty log...'
+            # print 'Empty log...'
+            pass
         return log
     except Exception, e:
-        print 'No log found '
+        # print 'No log found '
         return None
 
 
@@ -147,7 +153,6 @@ def start(mix_num):
     stop()
     log_add = 'http://pets.ewi.utwente.nl:59973/cmd/mix%s' % mix_num
     urllib2.urlopen(log_add)
-
     print 'Mixer %s started...' % mix_num
 
 
@@ -161,8 +166,8 @@ def stop():
 def parse_entry(entry):
     e =  entry.split(' ')
     date = datetime.strptime(e[0],"%Y-%m-%dT%H:%M:%S.%f")
-    participant = [2]
-    message = [4]
+    participant = e[2]
+    message = e[3]
     return {'date': date, 'participant': participant, 'message': message}
 
 
@@ -201,6 +206,15 @@ def send_message(recipient, message):
     #         if len(buf) > 0:
     #             print "Received response:\n" + str(buf)
     #             break
+def check_for_tim():
+    log = parseCacheLog()
+    if log is not None and log != '':
+        for entry in log.split('\n'):
+            if entry != '':
+                e = parse_entry(entry)
+                if e['participant'] == 'Tim':
+                    return True
+    return False
 
 def one_a():
     start(1)
@@ -218,103 +232,59 @@ def one_b():
 def one_c():
     start(1)
     for x in range(120):
-        send_message('ME', 'message #%s'% ( x))
+        send_message('ME ', 'message #%s'% ( x))
         print 'injecting message #%s\r' % ( x),
     second_freq(parseCacheLog())
     stop()
 
+def first_client():
+    log = parseClientLog()
+    e = parse_entry(log.split('\n')[0])['participant']
+    # print parse_entry(log.split('\n')[0])
+    return e
 
-# if __name__ == "__main__":
-one_a()
-# print parseCacheLog()
-# start(2)
 
-# for x in range(50):
-#     send_message('ME', 'SYNC')
-#     print 'Sending SYNC msgs'
-# stop()
-# start(2)
-# stop()
-# print parseCacheLog()
-# for attempt in range(10):
-#     start(2)
-#     print 'Attempt %s' % attempt
-#     for x in range(attempt):
-#         send_message('ME', 'Attempt %s: message #%s'% (attempt, x))
-#         print 'Attempt %s: injecting message #%s' % (attempt, x)
-#     print parseCacheLog()
-#     stop()
+
+def not_me():
+    log = parseCacheLog()
+    if log is not None and log != '':
+        for entry in log.split('\n'):
+            if entry != '':
+                e = parse_entry(entry)
+                if e['participant'] != 'ME':
+                    return e['participant']
+
 def n_1_a():
     start(3)
-    sleep(.1)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    message_sent = 7
-    while cache_num() < 6:
-        print parseCacheLog()
-    # sleep(2)
-    stop()
-    sleep(2)
-    print parseClientLog()
-    print parseCacheLog()
-
-def n_1_attack(mix_mes):
-    start(3)
-    sleep(.1)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    send_message('ME', '-'*7)
-    message_sent = 7
-    print parseClientLog()
-    while message_num() + message_sent < mix_mes:
-        print 'In the mix:%s\n sent: %s ' % ((message_num() + message_sent), message_sent)
-        print parseClientLog()
-        send_message('ME', '^^^^^^^^^^^^^^^^^^')
-        print parseCacheLog()
-        message_sent = message_sent + 1
-    # sleep(2)
-    print parseCacheLog()
-    stop()
-    print parseClientLog()
+    sleep(.05)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    send_message('ME ', '-'*7)
+    log = parseClientLog()
+    if log == '':
+        message_sent = 7
+        while cache_num() < 6:
+            pass
+        stop()
+        sleep(2)
+        if not check_for_tim() and not_me() is not  None:
+            rec = not_me()
+            sen = first_client()
+            print '%s is communicating with %s' %(sen, rec)
+            n_1_a()
+        elif not_me() is  None:
+            n_1_a()
+        else:
+            rec = not_me()
+            sen = first_client()
+            print '%s is communicating with %s' %(sen,rec)
+    else:
+        n_1_a()
 
 
 
 n_1_a()
-# n_1_attack(30)
-
-
-
-# start(3)
-# for x in range(220):
-#     send_message('ME', 'message #%s'% ( x))
-#     sleep(2)
-#     print 'injecting message #%s\r' % ( x)
-    # log =  parseCacheLog()
-    # print log
-    # print 'Log len %s' % len(log.split('\n'))
-# n_1_attack(14)
-# log =  parseCacheLog()
-#second_freq(log)
-# print parseCacheLog()
-
-# one_a()
-# log =  parseCacheLog()
-# print parseCacheLog()
-# print parseClientLog()
-
-# one_b()
-# log =  parseCacheLog()
-# print parseCacheLog()
-# print parseClientLog()
-
-
-# one_c()
