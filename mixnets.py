@@ -199,7 +199,7 @@ def one_a():
 
 def one_b():
     start(1)
-    send_message('TIM','s1750542')
+    send_message('TIM     ','s1750542  a1736574')
     sleep(10)
     stop()
 
@@ -212,6 +212,8 @@ def one_c():
     stop()
 
 
+# if __name__ == "__main__":
+one_a()
 # print parseCacheLog()
 # start(2)
 
@@ -242,6 +244,7 @@ def n_1_attack(mix_mes):
     # sleep(2)
     print parseCacheLog()
     stop()
+
 
 
 # start(3)
