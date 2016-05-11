@@ -124,6 +124,8 @@ We wrote the script showed in Appendix A to interact with the mixnet i.e., turn 
 We sent a message to TIM using the \textit{send\_message} method as shown below in Appendix A.
 \begin{verbatim}send_message('TIM     ','s1750542  and  s1736574') \end{verbatim}
 
+\includegraphics[width=\textwidth]{tim}
+
 \textbf{Part C:}
 
 \begin{figure}[h]
@@ -170,9 +172,11 @@ To deanonymize the party that is communicating with TIM we launch a n-1 attack. 
 
 We have find the threshold of every MIX in section~\ref{sec2} and we know that the first 2 batches are triggered with 8 messages. Thus, after starting the mixnet we insert 7 messages and wait for a message coming from some mixnet user. The very first message that arrive will push 6 messages to the cache, to which we have access through the logs. By comparing the client log and the cache log we are able to deanonymize the first message that enters the mixnet after our first 7 messages. We define a function called \textit{n\_1\_attack} where we start the mixnet, perform a n-1 attack and repeats until the deanonymized user is the one that communicates with Tim. \newline
 
+\includegraphics[width=\textwidth]{alice}
 
 \textbf{Part B:}
-The first way of preventing such type of attacks is by randomly shuffling the threshold of each node after every few random time delays. This will prevent the attacker to perform n-1 attack.
+The first method is to prevent less than 3 users in one particular batch of messages to be flushed to the next mix node after reaching its threshold.
+The second way of preventing such type of attacks is by randomising the threshold of each node after every few random time delays. This will prevent the attacker to perform n-1 attack.
 
 
 
@@ -183,6 +187,14 @@ The first way of preventing such type of attacks is by randomly shuffling the th
 \section{Appendix}
 
 
+
+% \section{Mixnet 1}
+% \section{Mixnet 2}
+% \section{Mixnet 3}
+
+\section{Mixnet 1}
+
+\section{Mixnet 3}
 \begin{lstlisting}[language=Python]
 # -*- coding: utf-8 -*-
 import urllib2
@@ -476,10 +488,6 @@ def n_1_a():
 n_1_a()
 
 \end{lstlisting}
-% \section{Mixnet 1}
-% \section{Mixnet 2}
-% \section{Mixnet 3}
-
 
 
 \label{appendix-sec1}
