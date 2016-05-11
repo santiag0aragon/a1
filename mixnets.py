@@ -42,17 +42,26 @@ def create_message(key_path, message):
     return e1
 
 
+def generate_not_random_key_iv():
+    N = 5
+    key_size = 16
+    iterations = 1
+    key = b'J6EXO'
+    salt = b'??K7|3˾?PP?x?'
+    iv = b'a'*16
+    derived_key = PBKDF2(key, salt, key_size, iterations)
+
+    return derived_key, iv
+
+
 def generate_key_iv():
     N = 5
     key_size = 16  # AES128
-    # iterations = 10000
-    iterations = 1
-    # key = b''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
-    key = b'J6EXO'
-    salt = b'??K7|3˾?PP?x?'#Random.new().read(key_size)
+    iterations = 1000
+    key = b''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    salt = Random.new().read(key_size)
 
-    # iv = Random.new().read(AES.block_size)
-    iv = b'a'*16
+    iv = Random.new().read(AES.block_size)
     derived_key = PBKDF2(key, salt, key_size, iterations)
 
     return derived_key, iv
@@ -104,7 +113,6 @@ def message_num():
     times = list()
 
     if log is not None and log != '':
-        # print len(log.split('\n'))
         for entry in log.split('\n'):
             if entry != '':
                 times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
@@ -116,7 +124,6 @@ def cache_num():
     times = list()
 
     if log is not None and log != '':
-        # print len(log.split('\n'))
         for entry in log.split('\n'):
             if entry != '':
                 times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
@@ -128,11 +135,11 @@ def parseClientLog():
     try:
         log = urllib2.urlopen(log_add).read()
         if log == '':
-            # print 'Empty log...'
+            print 'Empty log...'
             pass
         return log
     except Exception, e:
-        # print 'No log found '
+        print 'No log found '
         return ''
 
 
@@ -141,11 +148,11 @@ def parseCacheLog():
     try:
         log = urllib2.urlopen(log_add).read()
         if log == '':
-            # print 'Empty log...'
+            print 'Empty log...'
             pass
         return log
     except Exception, e:
-        # print 'No log found '
+        print 'No log found '
         return None
 
 
@@ -179,14 +186,11 @@ def second_freq(log):
                 times.append(parse_entry(entry)['date'].strftime('%H:%M:%S'))
 
         counts = Counter(times)
-        # plt.figure()
-        # counts = sorted(counts.items())
         df = pandas.DataFrame.from_dict(counts, orient='index')
         df =  df.sort_index()
         df.plot(kind='bar')
         plt.xlabel('Time')
         plt.ylabel('Frequency')
-        # # plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
         plt.axis([0, len(counts)+1, 0, max(counts.values())+1])
         plt.grid(True)
         plt.show()
@@ -200,12 +204,8 @@ def send_message(recipient, message):
     clientsocket.connect((HOST, PORT))
     e4 = pack_message(message)
     send_one_message(clientsocket, e4)
-    # while True:
-    #         buf = recv_one_message(clientsocket)
-    #         # data = clientsocket.recv(4096)
-    #         if len(buf) > 0:
-    #             print "Received response:\n" + str(buf)
-    #             break
+
+
 def check_for_tim():
     log = parseCacheLog()
     if log is not None and log != '':
