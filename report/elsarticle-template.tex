@@ -124,6 +124,8 @@ We developed an application mixnets.py [Appendix A] to send messages via the thr
 We sent a message to TIM from the send message method as shown below in mixnets.py application [Appendix A].
 \begin{verbatim}send_message('TIM     ','s1750542  and  s1736574') \end{verbatim}
 
+\includegraphics[width=\textwidth]{tim}
+
 \textbf{Part C:}
 
 \begin{figure}[h]
@@ -170,9 +172,10 @@ To deanonymize the party that is communicating with TIM we launch a n-1 attack. 
 
 We have find the threshold of every MIX in section~\ref{sec2} and we know that the first 2 batches are triggered with 8 messages. Thus, after starting the mixnet we insert 7 messages and wait for a message coming from some mixnet user. The very first message that arrive will push 6 messages to the cache, to which we have access through the logs. By comparing the client log and the cache log we are able to deanonymize the first message that enters the mixnet after our first 7 messages. We define a function called \textit{n\_1\_attack} where we start the mixnet, perform a n-1 attack and repeats until the deanonymized user is the one that communicates with Tim. \newline
 
+\includegraphics[width=\textwidth]{alice}
 
 \textbf{Part B:}
-The first way of preventing such type of attacks is by randomly shuffling the threshold of each node after every few random time delays. This will prevent the attacker to perform n-1 attack.
+The first way of preventing such type of attacks is by randomising the threshold of each node after every few random time delays. This will prevent the attacker to perform n-1 attack.
 
 
 
@@ -183,6 +186,14 @@ The first way of preventing such type of attacks is by randomly shuffling the th
 
 
 
+
+% \section{Mixnet 1}
+% \section{Mixnet 2}
+% \section{Mixnet 3}
+
+\section{Mixnet 1}
+
+\section{Mixnet 3}
 \begin{lstlisting}[language=Python]
 def n_1_a():
     start(3)
@@ -215,11 +226,6 @@ def n_1_a():
     else:
         n_1_a()
 \end{lstlisting}
-% \section{Mixnet 1}
-% \section{Mixnet 2}
-% \section{Mixnet 3}
-
-\section{Mixnet 1}
 
 \label{appendix-sec1}
 %% References
