@@ -148,16 +148,6 @@ We sent individual messages one by one with a short time delay and observed the 
 \newline
 We kept a count of the messages entering the second mixnet via MIX A and the messages received in the cache log after reaching the threshold $n_C$. After the first 8 messages passed through MIX A, only 6 messages were displayed in the cache log. Since we know that the threshold of MIX B has to be at least more than $2n_C$ and less than $3n_C$. This implies that the threshold of MIX B is 6 $<$ $n_B$ $<$ 9. Furthermore, we have only inject 8 messages and we know that $n_A\geq 1$ , therefore we conclude that the threshold $n_B$ is 7.
 \newline
-Considering $n_A$ is 2 and $n_C$ = 3, we kept a count of the messages sent into the mixnet that were not received by the cache log and noted the pending messages still in the queue for not reaching the threshold. We observed that $n_B$ required 6 more messages to reach a threshold of 7 keeping  track of unreceived messages, therefore the threshold $n_B$ is 7.
-\newline
-
-
-Considering $n_A$ is 2 and $n_C$ = 3, we kept a count of the messages sent into the mixnet that were not received by the cache log and noted the pending messages still in the queue for not reaching the threshold. We observed that $n_B$ required 6 more messages to reach a threshold of 7 keeping  track of unreceived messages, therefore the threshold $n_B$ is 7.
-
-Considering $n_A$ is 2 and $n_C$ = 3, we kept a count of the messages sent into the mixnet that were not received by the cache log and noted the pending messages still in the queue for not reaching the threshold. We observed that $n_B$ required 6 more messages to reach a threshold of 7 keeping  track of unreceived messages, therefore the threshold $n_B$ is 7.
-
-Considering $n_A$ is 2 and $n_C$ = 3, we kept a count of the messages sent into the mixnet that were not received by the cache log and noted the pending messages still in the queue for not reaching the threshold. We observed that $n_B$ required 6 more messages to reach a threshold of 7 keeping  track of unreceived messages, therefore the threshold $n_B$ is 7.
-=======
 We kept a count of the messages entering the second mixnet via MIX A and the messages received in the cache log after reaching the threshold $n_C$. After the first 8 messages passed through MIX A, only 6 messages were displayed in the cache log, that denotes that 1 $\leq$ $n_A, n_B$ $\leq$ 8. We sent more messages one by one until a second batch of 6 messages were received in the cache log. We noted that after sending 6 more messages, another batch of 6 messages was received in the cache log, this further helped us to analyse that MIX A always accepted even number of messages and the least common factor of the input messages to obtain an output was always 2. We therefore concluded that the threshold of $n_A$ is 2.
 
 \begin{center}
@@ -178,14 +168,14 @@ Threshold of $n_C$ is 3
 
 To deanonymize the party that is communicating with TIM we launch a n-1 attack. We recall that we are a global active attacker with insert capabilities, namely, we have access to two logs one at the entrance (client log) of the mixnet and one at very end (cache log).
 
-We have find the threshold of every MIX in section~\ref{sec2} and we know that the first 2 batches are triggered with 8 messages. Thus, after starting the mixnet we insert 7 messages and wait for a message coming from some mixnet user. The very first message that arrive will push 6 messages to the cache, to which we have access through the logs. By comparing the client log and the cache log we are able to deanonymize the first message that enters the mixnet after our first 7 messages. We define a function called \textit{n\_1\_attack} where we start the mixnet, perform a n-1 attack and repeats until the deanonymized user is the one that communicates with Tim.
-
-
+We have find the threshold of every MIX in section~\ref{sec2} and we know that the first 2 batches are triggered with 8 messages. Thus, after starting the mixnet we insert 7 messages and wait for a message coming from some mixnet user. The very first message that arrive will push 6 messages to the cache, to which we have access through the logs. By comparing the client log and the cache log we are able to deanonymize the first message that enters the mixnet after our first 7 messages. We define a function called \textit{n\_1\_attack} where we start the mixnet, perform a n-1 attack and repeats until the deanonymized user is the one that communicates with Tim. \newline
 
 
 \textbf{Part B:}
-....
-\newline
+The first way of preventing such type of attacks is by randomly shuffling the threshold of each node after every few random time delays. This will prevent the attacker to perform n-1 attack.
+
+
+
 
 
 %% appendix sections are then done as normal sections
