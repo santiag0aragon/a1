@@ -165,6 +165,9 @@ Threshold of $n_C$ is 3
 
 \textbf{Part B:}
 
+Is it always possible to determine the thresholds of each mixnode in a mixnet? If so, explain why. If not, provide a counterexample.
+
+To determine the thresholds of each mixnode in a mixnet is not always possible, i.e., Let $n_A n_C = \alpha n_B$, where $\alpha\ge2$. Every time $n_A$ threshold is reach, it would fire $\alpha$ times $n_B$ and one time $n_C$. If the mixnet do not introduce a huge batch processing delay, it would not be possible to determine $\alpha$. However, in a lot of situations it is possible to bound the thresholds good enough to perform an $n-1$ attack.
 \section*{Assignment 3}
 \textbf{Part A:}
 
